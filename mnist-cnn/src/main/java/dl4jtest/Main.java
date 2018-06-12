@@ -18,6 +18,12 @@ import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.deeplearning4j.eval.Evaluation;
+import org.deeplearning4j.ui.api.UIServer;
+import org.deeplearning4j.api.storage.StatsStorage;
+import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
+import org.deeplearning4j.ui.stats.StatsListener;
+
+import java.util.Scanner;
 
 /**
  * Digit classification on the MNIST-Dataset using a convolutional neural network.
@@ -52,7 +58,7 @@ public class Main {
 	    // also use momentum (first parameter)
 	    .updater(new Nesterovs(0.1, 0.01))
 	    .list()
-	    // the first layer is a convolution layer with a kernel of 5x5 pixels
+	    // the first layer is a convolution layer with a kernel size of 5x5 pixels
 	    .layer(0, new ConvolutionLayer.Builder(5, 5)
 		   // the number of channels are specified with the nIn method
 		   .nIn(numChannels)
@@ -68,7 +74,7 @@ public class Main {
 		   .kernelSize(2, 2)
 		   .stride(2, 2)
 		   .build())
-	    // use another convolutional layer, again with a 5x5 kernel
+	    // use another convolutional layer, again with a 5x5 kernel size
 	    .layer(2, new ConvolutionLayer.Builder(5, 5)
 		   .stride(1, 1)
 		   // this time use 50 different kernels
@@ -103,8 +109,13 @@ public class Main {
 	MultiLayerNetwork neuralNetwork = new MultiLayerNetwork(configuration);
 	// initialize the network
 	neuralNetwork.init();
-	// print the score every 10 iterations
-	neuralNetwork.setListeners(new ScoreIterationListener(10));
+
+	// set up a local web-UI to monitor the training available at localhost:9000
+	UIServer uiServer = UIServer.getInstance();
+	StatsStorage statsStorage = new InMemoryStatsStorage();
+	// additionally print the score to stdout every 10 iterations
+	neuralNetwork.setListeners(new StatsListener(statsStorage), new ScoreIterationListener(10));
+	uiServer.attach(statsStorage);
 
 	// now train the network for the desired number of epochs
 	for (int curEpoch = 0; curEpoch < numEpochs; curEpoch++) {
@@ -114,6 +125,11 @@ public class Main {
 	// evaluate the trained model and print the stats
 	Evaluation evaluation = neuralNetwork.evaluate(testSet);
 	System.out.println(evaluation.stats());
+	
+	// wait for input to tear down the web-UI
+	Scanner sc = new Scanner(System.in);
+	System.out.println("Press enter to end the application and destroy the web-UI.");
+	sc.nextLine();
 	
 	System.exit(0);
     }

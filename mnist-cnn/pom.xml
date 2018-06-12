@@ -5,16 +5,15 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>dl4jtest</groupId>
-  <artifactId>mnist</artifactId>
+  <artifactId>mnist-cnn</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>mnist</name>
-
+  <name>mnist-cnn</name>
+  
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <!-- <nd4j.backend>nd4j-cuda-9.1-platform</nd4j.backend> -->
   </properties>
 
   <dependencies>
@@ -23,11 +22,6 @@
       <artifactId>nd4j-native-platform</artifactId>
       <version>1.0.0-beta</version>
     </dependency>
-    <!-- <dependency> -->
-    <!--   <groupId>org.nd4j</groupId> -->
-    <!--   <artifactId>nd4j-cuda-9.1-platform</artifactId> -->
-    <!--   <version>1.0.0-beta</version> -->
-    <!-- </dependency> -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
@@ -72,7 +66,7 @@
           <artifactId>maven-deploy-plugin</artifactId>
           <version>2.8.2</version>
         </plugin>
-
+	<!-- this plugin is used to execute the project via mvn exec:java -->
 	<plugin>
 	  <groupId>org.codehaus.mojo</groupId>
 	  <artifactId>exec-maven-plugin</artifactId>
